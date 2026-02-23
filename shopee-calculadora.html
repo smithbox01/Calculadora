@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Shopee</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #EE4D2D;
+    --orange-light: #FF6B47;
+    --dark: #1a1a1a;
+    --card: #222;
+    --border: #333;
+    --text: #eee;
+    --muted: #888;
+    --green: #2ecc71;
+    --red: #e74c3c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .logo-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    color: var(--orange);
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .logo-sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .logo-icon {
+    background: var(--orange);
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 900px;
+  }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: var(--orange);
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .field {
+    margin-bottom: 14px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    background: #111;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .input-wrap:focus-within {
+    border-color: var(--orange);
+  }
+
+  .input-prefix {
+    padding: 10px 10px 10px 12px;
+    color: var(--orange);
+    font-weight: 700;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .input-wrap input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 12px 10px 4px;
+  }
+
+  .result-card {
+    background: var(--orange);
+    border-radius: 16px;
+    padding: 20px;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .result-item {
+    background: rgba(0,0,0,0.25);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .result-label {
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+
+  .result-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .result-value.green { color: #90EE90; }
+  .result-value.white { color: #fff; }
+  .result-value.yellow { color: #FFE066; }
+
+  .tip {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 4px;
+  }
+
+  .breakdown {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    grid-column: 1 / -1;
+  }
+
+  .breakdown-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    color: var(--orange);
+    margin-bottom: 14px;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid #2a2a2a;
+    font-size: 0.88rem;
+  }
+
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .val { font-weight: 700; }
+  .breakdown-row .val.neg { color: #FF6B6B; }
+  .breakdown-row .val.pos { color: var(--green); }
+  .breakdown-row.total { margin-top: 4px; border-top: 2px solid var(--orange); padding-top: 10px; font-weight: 700; }
+
+  .slider-group {
+    margin-bottom: 14px;
+  }
+
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .slider-val {
+    color: var(--orange);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--orange);
+    cursor: pointer;
+  }
+
+  .margin-selector {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .margin-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #111;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+
+  .margin-btn:hover, .margin-btn.active {
+    background: var(--orange);
+    color: white;
+    border-color: var(--orange);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">🛍️</div>
+  <div>
+    <div class="logo-text">Shopee Calc</div>
+    <div class="logo-sub">Calculadora de Preço de Venda</div>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- Produto -->
+  <div class="card">
+    <div class="card-title">📦 Dados do Produto</div>
+
+    <div class="field">
+      <label>Custo do Produto</label>
+      <div class="input-wrap">
+        <span class="input-prefix">R$</span>
+        <input type="number" id="custoProduto" value="26" min="0" step="0.01">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Despesas Variáveis (embalagem, etc.)</label>
+      <div class="input-wrap">
+        <span class="input-prefix">R$</span>
+        <input type="number" id="despesas" value="1" min="0" step="0.01">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Custo de Frete (se pago pelo vendedor)</label>
+      <div class="input-wrap">
+        <span class="input-prefix">R$</span>
+        <input type="number" id="frete" value="0" min="0" step="0.01">
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopee & Empresa -->
+  <div class="card">
+    <div class="card-title">🏪 Taxas & Margens</div>
+
+    <div class="slider-group">
+      <div class="slider-label">
+        <span>Comissão Shopee</span>
+        <span class="slider-val" id="taxaLabel">14%</span>
+      </div>
+      <input type="range" id="taxaShopee" min="0" max="25" step="0.5" value="14">
+      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted)">
+        <span>0%</span><span>25%</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Taxa Adicional / Anúncio Pago (R$)</label>
+      <div class="input-wrap">
+        <span class="input-prefix">R$</span>
+        <input type="number" id="taxaAdicional" value="0" min="0" step="0.01">
+      </div>
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-label">
+        <span>Imposto (Simples/MEI)</span>
+        <span class="slider-val" id="impostoLabel">0%</span>
+      </div>
+      <input type="range" id="imposto" min="0" max="15" step="0.5" value="0">
+      <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted)">
+        <span>0%</span><span>15%</span>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:4px">
+      <label>Margem de Lucro Desejada</label>
+      <div class="margin-selector" id="marginBtns">
+        <button class="margin-btn" data-val="10">10%</button>
+        <button class="margin-btn active" data-val="20">20%</button>
+        <button class="margin-btn" data-val="30">30%</button>
+        <button class="margin-btn" data-val="50">50%</button>
+        <button class="margin-btn" data-val="100">100%</button>
+      </div>
+      <div class="input-wrap" style="margin-top:8px">
+        <span class="input-prefix">%</span>
+        <input type="number" id="margem" value="20" min="0" step="1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Resultado -->
+  <div class="result-card">
+    <div class="result-item">
+      <div class="result-label">Preço Mínimo</div>
+      <div class="result-value white" id="precoMinimo">R$ --</div>
+      <div class="tip">Sem lucro — limite inferior</div>
+    </div>
+    <div class="result-item">
+      <div class="result-label">💰 Preço Sugerido</div>
+      <div class="result-value yellow" id="precoSugerido">R$ --</div>
+      <div class="tip">Com sua margem desejada</div>
+    </div>
+    <div class="result-item">
+      <div class="result-label">Lucro Líquido</div>
+      <div class="result-value green" id="lucroLiquido">R$ --</div>
+      <div class="tip">Após todas as taxas</div>
+    </div>
+    <div class="result-item">
+      <div class="result-label">Margem Real</div>
+      <div class="result-value white" id="margemReal">--%</div>
+      <div class="tip">% sobre o preço de venda</div>
+    </div>
+  </div>
+
+  <!-- Breakdown -->
+  <div class="breakdown">
+    <div class="breakdown-title">📊 Detalhamento dos Custos</div>
+    <div class="breakdown-row">
+      <span>Custo do Produto</span>
+      <span class="val neg" id="b-custo">R$ 0,00</span>
+    </div>
+    <div class="breakdown-row">
+      <span>Despesas Variáveis + Frete</span>
+      <span class="val neg" id="b-despesas">R$ 0,00</span>
+    </div>
+    <div class="breakdown-row">
+      <span>Comissão Shopee</span>
+      <span class="val neg" id="b-shopee">R$ 0,00</span>
+    </div>
+    <div class="breakdown-row">
+      <span>Taxa Adicional</span>
+      <span class="val neg" id="b-adicional">R$ 0,00</span>
+    </div>
+    <div class="breakdown-row">
+      <span>Imposto</span>
+      <span class="val neg" id="b-imposto">R$ 0,00</span>
+    </div>
+    <div class="breakdown-row total">
+      <span>Lucro Líquido</span>
+      <span class="val pos" id="b-lucro">R$ 0,00</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const fmt = (v) => 'R$ ' + v.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const fmtPct = (v) => v.toFixed(1).replace('.', ',') + '%';
+
+  function calc() {
+    const custo = parseFloat(document.getElementById('custoProduto').value) || 0;
+    const despesas = parseFloat(document.getElementById('despesas').value) || 0;
+    const frete = parseFloat(document.getElementById('frete').value) || 0;
+    const taxaShopee = parseFloat(document.getElementById('taxaShopee').value) || 0;
+    const taxaAdicional = parseFloat(document.getElementById('taxaAdicional').value) || 0;
+    const imposto = parseFloat(document.getElementById('imposto').value) || 0;
+    const margem = parseFloat(document.getElementById('margem').value) || 0;
+
+    const custoFixo = custo + despesas + frete + taxaAdicional;
+    const percentualTotal = (taxaShopee + imposto + margem) / 100;
+
+    // Preço mínimo: cobrir todos os custos sem lucro
+    // precoMin = custoFixo / (1 - taxas%)
+    const taxasSemMargem = (taxaShopee + imposto) / 100;
+    const precoMin = taxasSemMargem < 1 ? custoFixo / (1 - taxasSemMargem) : 0;
+
+    // Preço sugerido: margem % aplicada SOBRE O PREÇO DE VENDA (markup inverso)
+    // precoSug = custoFixo / (1 - taxas% - margem%)
+    const precoSug = percentualTotal < 1 ? custoFixo / (1 - percentualTotal) : 0;
+
+    // Lucro real ao vender no preço sugerido
+    const shopeeValor = precoSug * taxaShopee / 100;
+    const impostoValor = precoSug * imposto / 100;
+    const lucroReal = precoSug - custo - despesas - frete - taxaAdicional - shopeeValor - impostoValor;
+    const margemReal = precoSug > 0 ? (lucroReal / precoSug) * 100 : 0;
+
+    document.getElementById('precoMinimo').textContent = fmt(precoMin);
+    document.getElementById('precoSugerido').textContent = fmt(precoSug);
+    document.getElementById('lucroLiquido').textContent = fmt(lucroReal);
+    document.getElementById('margemReal').textContent = fmtPct(margemReal);
+
+    document.getElementById('b-custo').textContent = fmt(custo);
+    document.getElementById('b-despesas').textContent = fmt(despesas + frete);
+    document.getElementById('b-shopee').textContent = fmt(shopeeValor);
+    document.getElementById('b-adicional').textContent = fmt(taxaAdicional);
+    document.getElementById('b-imposto').textContent = fmt(impostoValor);
+    document.getElementById('b-lucro').textContent = fmt(lucroReal);
+  }
+
+  // Sliders
+  document.getElementById('taxaShopee').addEventListener('input', function() {
+    document.getElementById('taxaLabel').textContent = this.value + '%';
+    calc();
+  });
+
+  document.getElementById('imposto').addEventListener('input', function() {
+    document.getElementById('impostoLabel').textContent = this.value + '%';
+    calc();
+  });
+
+  // Margin buttons
+  document.getElementById('marginBtns').addEventListener('click', function(e) {
+    if (e.target.classList.contains('margin-btn')) {
+      document.querySelectorAll('.margin-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById('margem').value = e.target.dataset.val;
+      calc();
+    }
+  });
+
+  // All inputs
+  document.querySelectorAll('input[type="number"]').forEach(el => {
+    el.addEventListener('input', calc);
+  });
+
+  calc();
+</script>
+</body>
+</html>
