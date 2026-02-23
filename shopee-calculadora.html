@@ -375,6 +375,58 @@
     </div>
   </div>
 
+  <!-- Calculadora Reversa -->
+  <div class="breakdown" style="grid-column: 1 / -1; border-color: var(--orange); border-width: 2px;">
+    <div class="breakdown-title" style="font-size:1.2rem;">🔄 Calculadora Reversa — Quanto Posso Pagar pelo Produto?</div>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:16px;">Fixo: <strong style="color:var(--orange)">20% Shopee + R$ 4,00</strong> de taxa fixa. Informe o preço final e a margem desejada.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div class="field">
+          <label>Preço Final de Venda</label>
+          <div class="input-wrap">
+            <span class="input-prefix">R$</span>
+            <input type="number" id="r-precoFinal" value="50" min="0" step="0.01">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Margem de Lucro Desejada</label>
+          <div class="margin-selector" id="rMarginBtns">
+            <button class="margin-btn" data-val="10">10%</button>
+            <button class="margin-btn active" data-val="20">20%</button>
+            <button class="margin-btn" data-val="30">30%</button>
+            <button class="margin-btn" data-val="50">50%</button>
+          </div>
+          <div class="input-wrap" style="margin-top:8px">
+            <span class="input-prefix">%</span>
+            <input type="number" id="r-margem" value="20" min="0" step="1">
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#111;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <div style="font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Taxa Shopee (20%)</div>
+          <div style="font-size:1.3rem;font-weight:700;color:#FF6B6B;" id="r-taxaShopee">- R$ 0,00</div>
+        </div>
+        <div>
+          <div style="font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Taxa Fixa</div>
+          <div style="font-size:1.3rem;font-weight:700;color:#FF6B6B;">- R$ 4,00</div>
+        </div>
+        <div>
+          <div style="font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Seu Lucro</div>
+          <div style="font-size:1.3rem;font-weight:700;color:#90EE90;" id="r-lucro">R$ 0,00</div>
+        </div>
+        <div style="border-top:2px solid var(--orange);padding-top:12px;">
+          <div style="font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:4px;">✅ Custo Máximo do Produto</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#FFE066;" id="r-custoMaximo">R$ --</div>
+          <div style="font-size:0.72rem;color:var(--muted);">Pague até esse valor para ter a margem desejada</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Breakdown -->
   <div class="breakdown">
     <div class="breakdown-title">📊 Detalhamento dos Custos</div>
@@ -471,12 +523,41 @@
     }
   });
 
-  // All inputs
-  document.querySelectorAll('input[type="number"]').forEach(el => {
+  // All inputs (main calc)
+  document.querySelectorAll('#custoProduto, #despesas, #frete, #taxaAdicional, #margem').forEach(el => {
     el.addEventListener('input', calc);
   });
 
+  // Calculadora Reversa
+  function calcReversa() {
+    const precoFinal = parseFloat(document.getElementById('r-precoFinal').value) || 0;
+    const margem = parseFloat(document.getElementById('r-margem').value) || 0;
+
+    const taxaShopeeValor = precoFinal * 0.20;
+    const taxaFixa = 4;
+    const lucroDesejado = precoFinal * (margem / 100);
+    const custoMaximo = precoFinal - taxaShopeeValor - taxaFixa - lucroDesejado;
+
+    document.getElementById('r-taxaShopee').textContent = '- ' + fmt(taxaShopeeValor);
+    document.getElementById('r-lucro').textContent = fmt(lucroDesejado);
+    document.getElementById('r-custoMaximo').textContent = custoMaximo > 0 ? fmt(custoMaximo) : 'Inviavel ❌';
+    document.getElementById('r-custoMaximo').style.color = custoMaximo > 0 ? '#FFE066' : '#FF6B6B';
+  }
+
+  document.getElementById('r-precoFinal').addEventListener('input', calcReversa);
+  document.getElementById('r-margem').addEventListener('input', calcReversa);
+
+  document.getElementById('rMarginBtns').addEventListener('click', function(e) {
+    if (e.target.classList.contains('margin-btn')) {
+      document.querySelectorAll('#rMarginBtns .margin-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById('r-margem').value = e.target.dataset.val;
+      calcReversa();
+    }
+  });
+
   calc();
+  calcReversa();
 </script>
 </body>
 </html>
